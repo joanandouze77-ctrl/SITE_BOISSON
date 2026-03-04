@@ -1,0 +1,2124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Purple Cluster — Goûte l'univers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=Lilita+One&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --purple: #7B2FBE;
+      --deep-purple: #3D0066;
+      --neon-purple: #C060FF;
+      --pink: #FF4DA6;
+      --hot-pink: #FF1A8C;
+      --soft-pink: #FFB3D9;
+      --mars-red: #FF3860;
+      --venus-pink: #FFB6C1;
+      --jupiter-purple: #9B59B6;
+      --star-yellow: #FFE566;
+      --cosmic-blue: #0A0018;
+      --space-dark: #0D0020;
+      --card-bg: rgba(255,255,255,0.06);
+      --text-light: #F0E6FF;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--space-dark);
+      color: var(--text-light);
+      overflow-x: hidden;
+    }
+
+    /* ── STARS CANVAS ── */
+    #stars-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 48px;
+      background: rgba(10,0,24,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(192,96,255,0.18);
+      overflow: hidden;
+    }
+
+    /* Stars canvas sits behind nav content */
+    #nav-stars-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* All direct nav children sit above canvas */
+    nav > * { position: relative; z-index: 1; }
+
+    .nav-logo {
+      font-family: 'Lilita One', cursive;
+      font-size: 1.5rem;
+      color: var(--neon-purple);
+      text-shadow: 0 0 16px var(--neon-purple), 0 0 32px var(--purple);
+      letter-spacing: 1px;
+    }
+
+    .nav-cluster {
+      background: linear-gradient(90deg, #B040FF 0%, #D080FF 45%, #FFD700 75%, #FFE566 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+      filter: drop-shadow(0 0 8px rgba(192,96,255,0.5));
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: 'Fredoka One', cursive;
+      font-size: 0.95rem;
+      color: rgba(240,230,255,0.75);
+      text-decoration: none;
+      letter-spacing: 0.5px;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--neon-purple); }
+
+    .nav-cta {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1rem;
+      padding: 10px 26px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn:hover { transform: translateY(-2px) scale(1.04); }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--neon-purple);
+      color: var(--neon-purple);
+    }
+    .btn-outline:hover { box-shadow: 0 0 18px var(--neon-purple); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--neon-purple), var(--hot-pink));
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(192,96,255,0.4);
+    }
+    .btn-primary:hover { box-shadow: 0 8px 32px rgba(255,26,140,0.5); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 100px 24px 60px;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .hero-nebula {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 40%, rgba(123,47,190,0.35) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 70%, rgba(255,77,166,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 50% at 80% 20%, rgba(96,0,160,0.22) 0%, transparent 60%);
+      z-index: 0;
+    }
+
+    .hero-planet {
+      position: absolute;
+      border-radius: 50%;
+      z-index: 0;
+    }
+
+    .planet-1 {
+      width: 420px; height: 420px;
+      background: radial-gradient(circle at 35% 35%, #C060FF, #3D0066 70%);
+      box-shadow: 0 0 80px rgba(192,96,255,0.4), inset 0 0 60px rgba(0,0,0,0.5);
+      top: -80px; right: -120px;
+      animation: floatPlanet 8s ease-in-out infinite;
+    }
+
+    .planet-ring {
+      position: absolute;
+      width: 560px; height: 100px;
+      border: 14px solid rgba(192,96,255,0.35);
+      border-radius: 50%;
+      top: 30px; right: -195px;
+      transform: rotateX(72deg);
+      z-index: 0;
+    }
+
+    .planet-2 {
+      width: 160px; height: 160px;
+      background: radial-gradient(circle at 40% 40%, #FF6EB4, #7B2FBE 70%);
+      box-shadow: 0 0 40px rgba(255,77,166,0.3);
+      bottom: 60px; left: -50px;
+      animation: floatPlanet 10s ease-in-out infinite reverse;
+    }
+
+    @keyframes floatPlanet {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-24px); }
+    }
+
+    .hero-content { position: relative; z-index: 2; max-width: 720px; }
+
+    .hero-tag {
+      display: inline-block;
+      font-family: 'Fredoka One', cursive;
+      font-size: 0.85rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--star-yellow);
+      background: rgba(255,229,102,0.12);
+      border: 1px solid rgba(255,229,102,0.3);
+      padding: 6px 18px;
+      border-radius: 50px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-family: 'Lilita One', cursive;
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      line-height: 1.05;
+      color: #fff;
+      text-shadow: 0 0 40px rgba(192,96,255,0.6);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(90deg, var(--neon-purple), var(--hot-pink), var(--star-yellow));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: rgba(240,230,255,0.75);
+      max-width: 520px;
+      margin: 0 auto 36px;
+      line-height: 1.7;
+    }
+
+    .hero-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+    /* ── FLAVOR CARD STARS ── */
+    .flavor-card-stars {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .card-stars-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ── SECTION SHARED ── */
+    section { position: relative; z-index: 1; }
+
+    .section-label {
+      font-family: 'Fredoka One', cursive;
+      font-size: 0.75rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--neon-purple);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    h2 {
+      font-family: 'Lilita One', cursive;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .section-subtitle {
+      color: rgba(240,230,255,0.6);
+      max-width: 520px;
+      margin: 0 auto 48px;
+      line-height: 1.7;
+      font-size: 1.05rem;
+    }
+
+    /* ── FLAVORS ── */
+    .flavors {
+      padding: 100px 48px;
+      text-align: center;
+      background: linear-gradient(180deg, var(--space-dark) 0%, #0F0025 50%, var(--space-dark) 100%);
+    }
+
+    .flavors-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .flavor-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(192,96,255,0.2);
+      border-radius: 24px;
+      padding: 40px 28px 48px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .flavor-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 24px 60px rgba(192,96,255,0.2);
+    }
+
+    .flavor-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+    }
+
+    .flavor-card.jupiter::before { background: linear-gradient(90deg, #7B2FBE, #C060FF); }
+    .flavor-card.mars::before { background: linear-gradient(90deg, #FF3860, #FF4DA6); }
+    .flavor-card.venus::before { background: linear-gradient(90deg, #FFB6C1, #FF4DA6); }
+
+    /* CAN SVG CONTAINER */
+    .can-container {
+      width: 160px;
+      height: 260px;
+      margin: 0 auto 28px;
+      position: relative;
+      animation: canFloat 4s ease-in-out infinite;
+      filter: drop-shadow(0 24px 40px rgba(0,0,0,0.7));
+    }
+
+    .flavor-card.mars .can-container { animation-delay: -1.3s; }
+    .flavor-card.venus .can-container { animation-delay: -2.6s; }
+
+    @keyframes canFloat {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      50% { transform: translateY(-14px) rotate(2deg); }
+    }
+
+    .can-container svg { width: 100%; height: 100%; }
+
+    /* old can styles removed - using SVG now */
+
+    .flavor-card h3 {
+      font-family: 'Lilita One', cursive;
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .flavor-card p {
+      font-size: 0.95rem;
+      color: rgba(240,230,255,0.6);
+      line-height: 1.65;
+    }
+
+    .flavor-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Fredoka One', cursive;
+      color: var(--neon-purple);
+      text-decoration: none;
+      margin-top: 18px;
+      font-size: 0.95rem;
+      transition: gap 0.2s;
+    }
+    .flavor-link:hover { gap: 10px; }
+
+    /* ── COSMOS / PLANET CAROUSEL ── */
+    .cosmos {
+      padding: 100px 0 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cosmos-bg {
+      position: absolute;
+      inset: 0;
+      transition: background 0.8s ease;
+    }
+
+    .cosmos-content {
+      position: relative;
+      z-index: 2;
+      max-width: 600px;
+      margin: 0 auto 60px;
+      padding: 0 24px;
+    }
+
+    /* Carousel wrapper */
+    .planet-carousel {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Arrow buttons */
+    .carousel-arrow {
+      flex-shrink: 0;
+      width: 54px; height: 54px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(192,96,255,0.35);
+      color: rgba(192,96,255,0.9);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s, color 0.2s;
+      z-index: 10;
+    }
+
+    .carousel-arrow:hover {
+      background: rgba(192,96,255,0.15);
+      border-color: var(--neon-purple);
+      color: #fff;
+      transform: scale(1.1);
+    }
+
+    /* Track */
+    .carousel-track {
+      flex: 1;
+      overflow: hidden;
+      min-height: 480px;
+    }
+
+    /* Each slide */
+    .planet-slide {
+      display: flex;
+      align-items: center;
+      gap: 60px;
+      padding: 20px 40px;
+      animation: slideIn 0.5s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .slide-from-left { animation: slideInLeft 0.5s ease; }
+
+    /* Planet scene */
+    .planet-scene {
+      position: relative;
+      flex-shrink: 0;
+      width: 300px;
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Orbiting moon path */
+    .orbit-path {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      animation: orbitSpin 10s linear infinite;
+    }
+    .orbit-fast { animation-duration: 7s; }
+    .orbit-slow { animation-duration: 14s; }
+
+    .orbit-moon {
+      position: absolute;
+      top: 8px; left: calc(50% - 7px);
+      width: 14px; height: 14px;
+      border-radius: 50%;
+    }
+
+    .jupiter-moon { background: radial-gradient(circle at 35% 35%, #E0C0FF, #8B3FC8); box-shadow: 0 0 10px rgba(192,96,255,0.6); }
+    .mars-moon    { background: radial-gradient(circle at 35% 35%, #FFA080, #CC3040); box-shadow: 0 0 10px rgba(255,80,80,0.6); }
+    .venus-moon   { background: radial-gradient(circle at 35% 35%, #FFE8F4, #E898C8); box-shadow: 0 0 10px rgba(255,182,200,0.6); }
+
+    /* Planet sphere */
+    .planet-sphere {
+      position: relative;
+      width: 190px; height: 190px;
+      border-radius: 50%;
+      overflow: hidden;
+      animation: planetPulse 5s ease-in-out infinite;
+      z-index: 2;
+    }
+
+    @keyframes planetPulse {
+      0%,100% { filter: brightness(1) drop-shadow(0 0 30px var(--pg-color,rgba(192,96,255,0.5))); }
+      50%      { filter: brightness(1.1) drop-shadow(0 0 55px var(--pg-color,rgba(192,96,255,0.5))); }
+    }
+
+    .jupiter-sphere {
+      background: radial-gradient(ellipse at 38% 35%, #D090FF 0%, #8B2FCC 35%, #5A1A90 65%, #2D0050 100%);
+      --pg-color: rgba(192,96,255,0.55);
+    }
+    .mars-sphere {
+      background: radial-gradient(ellipse at 38% 35%, #FF9090 0%, #EE3050 35%, #BB1030 65%, #780020 100%);
+      --pg-color: rgba(255,56,80,0.55);
+    }
+    .venus-sphere {
+      background: radial-gradient(ellipse at 38% 35%, #FFE8F4 0%, #FFBCD0 40%, #EE90B8 65%, #C06090 100%);
+      --pg-color: rgba(255,182,200,0.55);
+    }
+
+    /* Banded atmosphere stripes */
+    .planet-band {
+      position: absolute;
+      left: 0; right: 0;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+
+    .band-j1 { top: 30%; height: 18%; background: rgba(255,255,255,0.07); border-radius: 0; }
+    .band-j2 { top: 55%; height: 12%; background: rgba(0,0,0,0.12); border-radius: 0; }
+    .band-m1 { top: 35%; height: 14%; background: rgba(255,200,200,0.1); border-radius: 0; }
+    .band-m2 { top: 58%; height: 10%; background: rgba(0,0,0,0.1); border-radius: 0; }
+    .band-v1 { top: 28%; height: 16%; background: rgba(255,255,255,0.12); border-radius: 0; }
+    .band-v2 { top: 52%; height: 12%; background: rgba(200,100,130,0.1); border-radius: 0; }
+
+    /* Highlight */
+    .planet-shine {
+      position: absolute;
+      top: 12%; left: 18%;
+      width: 38%; height: 32%;
+      background: radial-gradient(ellipse, rgba(255,255,255,0.28) 0%, transparent 70%);
+      border-radius: 50%;
+      transform: rotate(-25deg);
+    }
+
+    /* Ring - SVG overlay centered on scene */
+    .planet-ring-svg {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    /* Floating particles */
+    .planet-particle {
+      position: absolute;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--c, #fff);
+      box-shadow: 0 0 8px var(--c, #fff);
+      animation: particleFly var(--d, 3s) ease-in-out infinite alternate;
+    }
+
+    @keyframes particleFly {
+      0%   { transform: translate(0,0) scale(1); opacity: 0.8; }
+      100% { transform: translate(8px,-12px) scale(1.5); opacity: 0.3; }
+    }
+
+    /* Info panel */
+    .planet-info {
+      flex: 1;
+      text-align: left;
+      padding: 10px 0;
+    }
+
+    .planet-badge {
+      display: inline-block;
+      font-family: 'Fredoka One', cursive;
+      font-size: 0.78rem;
+      letter-spacing: 3px;
+      padding: 6px 18px;
+      border-radius: 50px;
+      margin-bottom: 16px;
+    }
+
+    .jupiter-badge { background: rgba(192,96,255,0.15); border: 1px solid rgba(192,96,255,0.4); color: #C060FF; }
+    .mars-badge    { background: rgba(255,56,80,0.15);  border: 1px solid rgba(255,56,80,0.4);  color: #FF8090; }
+    .venus-badge   { background: rgba(255,182,200,0.12); border: 1px solid rgba(255,182,200,0.4); color: #FFB6C8; }
+
+    .planet-name {
+      font-family: 'Lilita One', cursive;
+      font-size: 2rem;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+
+    .planet-story {
+      font-size: 1rem;
+      color: rgba(240,230,255,0.72);
+      line-height: 1.75;
+      max-width: 460px;
+      margin-bottom: 20px;
+    }
+
+    .planet-story strong { color: rgba(240,230,255,0.95); }
+
+    .planet-tags {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .ptag {
+      font-family: 'Fredoka One', cursive;
+      font-size: 0.82rem;
+      padding: 5px 14px;
+      border-radius: 50px;
+      border: 1px solid rgba(192,96,255,0.35);
+      color: rgba(192,96,255,0.9);
+      background: rgba(192,96,255,0.08);
+    }
+
+    /* Dots */
+    .carousel-dots {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 40px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .cdot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: rgba(192,96,255,0.25);
+      border: 1.5px solid rgba(192,96,255,0.4);
+      cursor: pointer;
+      transition: background 0.25s, transform 0.25s;
+      padding: 0;
+    }
+
+    .cdot.active {
+      background: var(--neon-purple);
+      transform: scale(1.35);
+      box-shadow: 0 0 10px var(--neon-purple);
+    }
+
+    /* ── TESTIMONIALS ── */
+    .testimonials {
+      padding: 100px 48px;
+      background: linear-gradient(180deg, var(--space-dark), #100030, var(--space-dark));
+      text-align: center;
+    }
+
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .testi-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(192,96,255,0.15);
+      border-radius: 20px;
+      padding: 28px;
+      text-align: left;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+
+    .testi-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(192,96,255,0.4);
+    }
+
+    .testi-platform {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .testi-logo {
+      font-family: 'Fredoka One', cursive;
+      font-size: 0.85rem;
+      color: rgba(240,230,255,0.5);
+    }
+
+    .testi-stars {
+      color: var(--star-yellow);
+      font-size: 0.85rem;
+      margin-left: auto;
+      letter-spacing: 2px;
+    }
+
+    .testi-card blockquote {
+      font-size: 1rem;
+      color: var(--text-light);
+      line-height: 1.65;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .testi-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .testi-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .testi-info strong {
+      display: block;
+      font-size: 0.9rem;
+      font-family: 'Fredoka One', cursive;
+    }
+
+    .testi-info span {
+      font-size: 0.8rem;
+      color: rgba(240,230,255,0.45);
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 100px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 70% at 50% 50%, rgba(123,47,190,0.3) 0%, transparent 70%);
+    }
+
+    .cta-content {
+      position: relative;
+      z-index: 2;
+      max-width: 600px;
+      margin: 0 auto 60px;
+    }
+
+    .cta-visual {
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cta-cans {
+      display: flex;
+      gap: 32px;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .cta-can {
+      width: 90px;
+      height: 160px;
+      border-radius: 14px 14px 10px 10px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow:
+        inset -8px 0 16px rgba(0,0,0,0.35),
+        inset 4px 0 12px rgba(255,255,255,0.15),
+        0 16px 40px rgba(0,0,0,0.5);
+    }
+
+    .cta-can-j { background: linear-gradient(160deg, #A040E0, #5A1A90); transform: rotate(-5deg); }
+    .cta-can-m { background: linear-gradient(160deg, #FF6080, #CC1040); transform: scale(1.12); }
+    .cta-can-v { background: linear-gradient(160deg, #FFD0E8, #E890A8); transform: rotate(5deg); }
+
+    .cta-can-label {
+      font-family: 'Lilita One', cursive;
+      font-size: 0.55rem;
+      text-align: center;
+      color: rgba(255,255,255,0.9);
+      line-height: 1.4;
+    }
+
+    .orbit-ring {
+      position: absolute;
+      border: 2px dashed rgba(192,96,255,0.2);
+      border-radius: 50%;
+      animation: orbitSpin 20s linear infinite;
+    }
+
+    .orbit-1 { width: 300px; height: 300px; }
+    .orbit-2 { width: 460px; height: 200px; transform: rotateX(60deg); animation-direction: reverse; }
+
+    @keyframes orbitSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .orbit-dot {
+      position: absolute;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--neon-purple);
+      box-shadow: 0 0 12px var(--neon-purple);
+      top: -5px; left: calc(50% - 5px);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #060010;
+      border-top: 1px solid rgba(192,96,255,0.15);
+      padding: 72px 48px 40px;
+    }
+
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+      gap: 40px;
+      max-width: 1100px;
+      margin: 0 auto 60px;
+    }
+
+    .footer-brand .nav-logo { font-size: 1.8rem; display: block; margin-bottom: 14px; }
+
+    .footer-brand p {
+      font-size: 0.9rem;
+      color: rgba(240,230,255,0.5);
+      line-height: 1.7;
+      max-width: 240px;
+      margin-bottom: 24px;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 12px;
+    }
+
+    .social-link {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(192,96,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .social-link:hover {
+      background: rgba(192,96,255,0.15);
+      border-color: var(--neon-purple);
+    }
+
+    .footer-col h4 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      color: rgba(240,230,255,0.9);
+      margin-bottom: 16px;
+    }
+
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: 10px; }
+    .footer-col ul li a {
+      font-size: 0.88rem;
+      color: rgba(240,230,255,0.45);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-col ul li a:hover { color: var(--neon-purple); }
+
+    .footer-bottom {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 28px;
+    }
+
+    .footer-bottom p {
+      font-size: 0.82rem;
+      color: rgba(240,230,255,0.3);
+    }
+
+    .footer-legal {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-legal a {
+      font-size: 0.82rem;
+      color: rgba(240,230,255,0.3);
+      text-decoration: none;
+    }
+
+    .footer-legal a:hover { color: var(--neon-purple); }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ── FLOATING ASTEROIDS ── */
+    .asteroid {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.08;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 14px 24px; }
+      .nav-links { display: none; }
+      .flavors-grid, .testi-grid { grid-template-columns: 1fr; }
+      .cosmos-gallery { grid-template-columns: 1fr 1fr; }
+      .cg1, .cg3 { grid-row: auto; height: 200px; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Starfield -->
+<canvas id="stars-canvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <canvas id="nav-stars-canvas"></canvas>
+  <span class="nav-logo">purple✦<span class="nav-cluster">CLUSTER</span></span>
+  <ul class="nav-links">
+    <li><a href="#about">Notre histoire</a></li>
+    <li><a href="#flavors">Les saveurs</a></li>
+    <li><a href="#cosmos">Cosmos</a></li>
+    <li><a href="#voices">Avis</a></li>
+    <li><a href="#footer">En savoir plus ▾</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="#shop" class="btn btn-outline">Boutique</a>
+    <a href="#discover" class="btn btn-primary">Découvrir</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-nebula"></div>
+  <div class="hero-planet planet-1">
+    <div class="planet-ring"></div>
+  </div>
+  <div class="hero-planet planet-2"></div>
+
+  <div class="hero-content reveal">
+    <span class="hero-tag">✦ Boisson cosmique</span>
+    <h1>Goûte <span>l'univers</span><br>à chaque gorgée</h1>
+    <p>Trois saveurs cosmiques t'attendent. Chaque canette renferme une constellation de goûts qui explose en bouche — une odyssée galactique en une seule gorgée.</p>
+    <div class="hero-btns">
+      <a href="#discover" class="btn btn-primary">🚀 Découvrir</a>
+      <a href="#footer" class="btn btn-outline">En savoir plus →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FLAVORS -->
+<section class="flavors" id="flavors">
+  <span class="section-label">Les Saveurs</span>
+  <h2 class="reveal">Trois mondes,<br>une infinité de goûts</h2>
+  <p class="section-subtitle reveal">Chaque saveur raconte une histoire écrite dans les étoiles. Choisis ta planète et laisse-toi emporter dans un voyage cosmique.</p>
+
+  <div class="flavors-grid">
+
+    <!-- JUPITER -->
+    <div class="flavor-card jupiter reveal">
+      <!-- Star decoration -->
+      <div class="flavor-card-stars">
+        <canvas class="card-stars-canvas"></canvas>
+      </div>
+      <div class="can-container">
+        <!-- JUPITER CAN SVG -->
+        <svg viewBox="0 0 160 260" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+          <defs>
+            <linearGradient id="jbody" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#3D006B"/>
+              <stop offset="18%" stop-color="#6A14B0"/>
+              <stop offset="45%" stop-color="#9B2FE8"/>
+              <stop offset="65%" stop-color="#7B2FBE"/>
+              <stop offset="85%" stop-color="#5A1A90"/>
+              <stop offset="100%" stop-color="#2D0050"/>
+            </linearGradient>
+            <linearGradient id="jtop" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#D0D0D0"/>
+              <stop offset="40%" stop-color="#A8A8A8"/>
+              <stop offset="100%" stop-color="#707070"/>
+            </linearGradient>
+            <linearGradient id="jbottom" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#888"/>
+              <stop offset="100%" stop-color="#555"/>
+            </linearGradient>
+            <linearGradient id="jshine" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="rgba(255,255,255,0)"/>
+              <stop offset="30%" stop-color="rgba(255,255,255,0.18)"/>
+              <stop offset="50%" stop-color="rgba(255,255,255,0.08)"/>
+              <stop offset="100%" stop-color="rgba(0,0,0,0.15)"/>
+            </linearGradient>
+            <linearGradient id="jcluster" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#9B2FE8"/>
+              <stop offset="40%" stop-color="#C060FF"/>
+              <stop offset="70%" stop-color="#FFD700"/>
+              <stop offset="100%" stop-color="#FFE566"/>
+            </linearGradient>
+            <radialGradient id="jplanet" cx="38%" cy="35%" r="60%">
+              <stop offset="0%" stop-color="#E0A0FF"/>
+              <stop offset="50%" stop-color="#9B2FE8"/>
+              <stop offset="100%" stop-color="#3D0066"/>
+            </radialGradient>
+            <filter id="jglow">
+              <feGaussianBlur stdDeviation="2.5" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <clipPath id="jcanclip">
+              <rect x="18" y="22" width="124" height="218" rx="14" ry="14"/>
+            </clipPath>
+          </defs>
+
+          <!-- CAN BODY -->
+          <rect x="18" y="22" width="124" height="218" rx="14" ry="14" fill="url(#jbody)"/>
+          <rect x="18" y="22" width="124" height="218" rx="14" ry="14" fill="url(#jshine)"/>
+
+          <!-- HIGHLIGHT STRIPE -->
+          <rect x="32" y="22" width="22" height="218" rx="0" fill="rgba(255,255,255,0.07)" clip-path="url(#jcanclip)"/>
+
+          <!-- DARK EDGE -->
+          <rect x="130" y="22" width="12" height="218" rx="0" fill="rgba(0,0,0,0.2)" clip-path="url(#jcanclip)"/>
+
+          <!-- TOP LID -->
+          <ellipse cx="80" cy="22" rx="62" ry="11" fill="url(#jtop)"/>
+          <ellipse cx="80" cy="18" rx="38" ry="6" fill="#C0C0C0"/>
+          <ellipse cx="80" cy="16" rx="22" ry="4" fill="#D8D8D8"/>
+          <!-- pull tab -->
+          <rect x="74" y="10" width="12" height="8" rx="3" fill="#B0B0B0" stroke="#888" stroke-width="0.5"/>
+          <ellipse cx="80" cy="10" rx="5" ry="2.5" fill="#999"/>
+
+          <!-- BOTTOM -->
+          <ellipse cx="80" cy="240" rx="62" ry="11" fill="url(#jbottom)"/>
+          <ellipse cx="80" cy="243" rx="54" ry="7" fill="#606060"/>
+
+          <!-- ===== LOGO AREA ===== -->
+          <!-- Circular planet badge background -->
+          <circle cx="80" cy="115" r="44" fill="rgba(0,0,0,0.25)"/>
+          <circle cx="80" cy="115" r="42" fill="rgba(61,0,102,0.6)" stroke="rgba(192,96,255,0.5)" stroke-width="1.5"/>
+
+          <!-- Planet sphere -->
+          <circle cx="80" cy="115" r="28" fill="url(#jplanet)" filter="url(#jglow)"/>
+
+          <!-- Planet ring (behind text but above planet) -->
+          <ellipse cx="80" cy="115" rx="40" ry="10" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="3.5"/>
+          <ellipse cx="80" cy="115" rx="40" ry="10" fill="none" stroke="rgba(192,96,255,0.35)" stroke-width="6"/>
+          <!-- ring front occlusion -->
+          <path d="M 44 115 Q 80 103 116 115" fill="rgba(61,0,102,0.7)" stroke="none"/>
+
+          <!-- Stars scattered - more yellow & orange -->
+          <circle cx="50" cy="82" r="1.8" fill="#FFE566" opacity="0.95"/>
+          <circle cx="110" cy="88" r="1.4" fill="#FFB830" opacity="0.9"/>
+          <circle cx="44" cy="138" r="1.2" fill="#fff" opacity="0.7"/>
+          <circle cx="116" cy="142" r="1.6" fill="#FFE566" opacity="0.9"/>
+          <circle cx="62" cy="76" r="1" fill="#FF9820" opacity="0.75"/>
+          <circle cx="98" cy="78" r="1.2" fill="#FFE566" opacity="0.8"/>
+          <circle cx="55" cy="152" r="1.1" fill="#FFB830" opacity="0.75"/>
+          <circle cx="106" cy="155" r="1.3" fill="#FF9820" opacity="0.7"/>
+          <circle cx="37" cy="100" r="1" fill="#FFE566" opacity="0.7"/>
+          <circle cx="122" cy="105" r="1.1" fill="#FFB830" opacity="0.8"/>
+          <circle cx="42" cy="125" r="0.9" fill="#FF9820" opacity="0.65"/>
+          <circle cx="118" cy="128" r="1" fill="#FFE566" opacity="0.7"/>
+          <!-- 4-point sparkle stars -->
+          <g transform="translate(48,86)" fill="#FFE566" opacity="0.95">
+            <polygon points="0,-4 1,-1 4,0 1,1 0,4 -1,1 -4,0 -1,-1"/>
+          </g>
+          <g transform="translate(112,90)" fill="#FFB830" opacity="0.9">
+            <polygon points="0,-3.5 0.9,-0.9 3.5,0 0.9,0.9 0,3.5 -0.9,0.9 -3.5,0 -0.9,-0.9"/>
+          </g>
+          <g transform="translate(40,115)" fill="#FF9820" opacity="0.8">
+            <polygon points="0,-3 0.7,-0.7 3,0 0.7,0.7 0,3 -0.7,0.7 -3,0 -0.7,-0.7"/>
+          </g>
+          <g transform="translate(120,118)" fill="#FFE566" opacity="0.85">
+            <polygon points="0,-3 0.7,-0.7 3,0 0.7,0.7 0,3 -0.7,0.7 -3,0 -0.7,-0.7"/>
+          </g>
+
+          <!-- "purple" text (italic, violet) -->
+          <text x="80" y="91" text-anchor="middle" font-family="'Lilita One', cursive" font-size="14" fill="#C060FF" font-style="italic" letter-spacing="1">purple</text>
+
+          <!-- "CLUSTER" text (gradient, bold, in front of planet) -->
+          <defs>
+            <linearGradient id="jcluster2" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#B040FF"/>
+              <stop offset="45%" stop-color="#D080FF"/>
+              <stop offset="75%" stop-color="#FFD700"/>
+              <stop offset="100%" stop-color="#FFE566"/>
+            </linearGradient>
+          </defs>
+          <text x="80" y="127" text-anchor="middle" font-family="'Lilita One', cursive" font-size="19" fill="url(#jcluster2)" letter-spacing="1.5" stroke="rgba(0,0,0,0.4)" stroke-width="3" paint-order="stroke">CLUSTER</text>
+
+          <!-- Flavor band -->
+          <rect x="18" y="168" width="124" height="36" fill="rgba(0,0,0,0.3)" clip-path="url(#jcanclip)"/>
+          <rect x="18" y="168" width="124" height="36" fill="rgba(255,229,102,0.08)" clip-path="url(#jcanclip)"/>
+
+          <!-- Flavor label -->
+          <text x="80" y="179" text-anchor="middle" font-family="'Fredoka One', cursive" font-size="8" fill="rgba(255,229,102,0.7)" letter-spacing="3">GOÛT</text>
+          <text x="80" y="197" text-anchor="middle" font-family="'Lilita One', cursive" font-size="16" fill="#FFE566" letter-spacing="2" stroke="rgba(0,0,0,0.5)" stroke-width="2" paint-order="stroke">JUPITER</text>
+        </svg>
+      </div>
+      <h3>Jupiter Profonde & Mystérieuse</h3>
+      <p>Lime acidulée, gingembre frais et clous de girofle se fondent dans une profondeur violette saisissante et enveloppante.</p>
+      <a href="#" class="flavor-link">Explorer la saveur →</a>
+    </div>
+
+    <!-- MARS -->
+    <div class="flavor-card mars reveal">
+      <div class="flavor-card-stars">
+        <canvas class="card-stars-canvas"></canvas>
+      </div>
+      <div class="can-container">
+        <!-- MARS CAN SVG -->
+        <svg viewBox="0 0 160 260" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+          <defs>
+            <linearGradient id="mbody" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#AA0030"/>
+              <stop offset="18%" stop-color="#DD1850"/>
+              <stop offset="45%" stop-color="#FF5070"/>
+              <stop offset="65%" stop-color="#FF3860"/>
+              <stop offset="85%" stop-color="#CC1040"/>
+              <stop offset="100%" stop-color="#880020"/>
+            </linearGradient>
+            <linearGradient id="mtop" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#D0D0D0"/>
+              <stop offset="40%" stop-color="#A8A8A8"/>
+              <stop offset="100%" stop-color="#707070"/>
+            </linearGradient>
+            <linearGradient id="mshine" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="rgba(255,255,255,0)"/>
+              <stop offset="30%" stop-color="rgba(255,255,255,0.18)"/>
+              <stop offset="50%" stop-color="rgba(255,255,255,0.08)"/>
+              <stop offset="100%" stop-color="rgba(0,0,0,0.15)"/>
+            </linearGradient>
+            <radialGradient id="mplanet" cx="38%" cy="35%" r="60%">
+              <stop offset="0%" stop-color="#FF9090"/>
+              <stop offset="50%" stop-color="#FF3860"/>
+              <stop offset="100%" stop-color="#880020"/>
+            </radialGradient>
+            <filter id="mglow">
+              <feGaussianBlur stdDeviation="2.5" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <clipPath id="mcanclip">
+              <rect x="18" y="22" width="124" height="218" rx="14" ry="14"/>
+            </clipPath>
+            <linearGradient id="mcluster" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#B040FF"/>
+              <stop offset="45%" stop-color="#D080FF"/>
+              <stop offset="75%" stop-color="#FFD700"/>
+              <stop offset="100%" stop-color="#FFE566"/>
+            </linearGradient>
+          </defs>
+
+          <rect x="18" y="22" width="124" height="218" rx="14" ry="14" fill="url(#mbody)"/>
+          <rect x="18" y="22" width="124" height="218" rx="14" ry="14" fill="url(#mshine)"/>
+          <rect x="32" y="22" width="22" height="218" fill="rgba(255,255,255,0.07)" clip-path="url(#mcanclip)"/>
+          <rect x="130" y="22" width="12" height="218" fill="rgba(0,0,0,0.2)" clip-path="url(#mcanclip)"/>
+
+          <ellipse cx="80" cy="22" rx="62" ry="11" fill="url(#mtop)"/>
+          <ellipse cx="80" cy="18" rx="38" ry="6" fill="#C0C0C0"/>
+          <ellipse cx="80" cy="16" rx="22" ry="4" fill="#D8D8D8"/>
+          <rect x="74" y="10" width="12" height="8" rx="3" fill="#B0B0B0" stroke="#888" stroke-width="0.5"/>
+          <ellipse cx="80" cy="10" rx="5" ry="2.5" fill="#999"/>
+
+          <ellipse cx="80" cy="240" rx="62" ry="11" fill="#666"/>
+          <ellipse cx="80" cy="243" rx="54" ry="7" fill="#555"/>
+
+          <!-- Badge -->
+          <circle cx="80" cy="115" r="44" fill="rgba(0,0,0,0.25)"/>
+          <circle cx="80" cy="115" r="42" fill="rgba(100,0,30,0.6)" stroke="rgba(255,80,80,0.5)" stroke-width="1.5"/>
+
+          <!-- Planet -->
+          <circle cx="80" cy="115" r="28" fill="url(#mplanet)" filter="url(#mglow)"/>
+
+          <!-- Ring -->
+          <ellipse cx="80" cy="115" rx="40" ry="10" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="3.5"/>
+          <ellipse cx="80" cy="115" rx="40" ry="10" fill="none" stroke="rgba(255,80,80,0.3)" stroke-width="6"/>
+          <path d="M 44 115 Q 80 103 116 115" fill="rgba(100,0,20,0.7)" stroke="none"/>
+
+          <!-- Stars -->
+          <circle cx="50" cy="82" r="1.8" fill="#FFE566" opacity="0.95"/>
+          <circle cx="110" cy="88" r="1.4" fill="#FFB830" opacity="0.9"/>
+          <circle cx="44" cy="138" r="1.2" fill="#fff" opacity="0.7"/>
+          <circle cx="116" cy="142" r="1.6" fill="#FFE566" opacity="0.9"/>
+          <circle cx="62" cy="76" r="1" fill="#FF9820" opacity="0.8"/>
+          <circle cx="98" cy="78" r="1.2" fill="#FFE566" opacity="0.8"/>
+          <circle cx="55" cy="152" r="1.1" fill="#FFB830" opacity="0.75"/>
+          <circle cx="106" cy="155" r="1.3" fill="#FF9820" opacity="0.7"/>
+          <circle cx="37" cy="100" r="1" fill="#FFE566" opacity="0.7"/>
+          <circle cx="122" cy="105" r="1.1" fill="#FFB830" opacity="0.8"/>
+          <circle cx="42" cy="125" r="0.9" fill="#FF9820" opacity="0.65"/>
+          <circle cx="118" cy="128" r="1" fill="#FFE566" opacity="0.7"/>
+          <g transform="translate(48,86)" fill="#FFE566" opacity="0.95">
+            <polygon points="0,-4 1,-1 4,0 1,1 0,4 -1,1 -4,0 -1,-1"/>
+          </g>
+          <g transform="translate(112,90)" fill="#FFB830" opacity="0.9">
+            <polygon points="0,-3.5 0.9,-0.9 3.5,0 0.9,0.9 0,3.5 -0.9,0.9 -3.5,0 -0.9,-0.9"/>
+          </g>
+          <g transform="translate(40,115)" fill="#FF9820" opacity="0.8">
+            <polygon points="0,-3 0.7,-0.7 3,0 0.7,0.7 0,3 -0.7,0.7 -3,0 -0.7,-0.7"/>
+          </g>
+          <g transform="translate(120,118)" fill="#FFE566" opacity="0.85">
+            <polygon points="0,-3 0.7,-0.7 3,0 0.7,0.7 0,3 -0.7,0.7 -3,0 -0.7,-0.7"/>
+          </g>
+
+          <!-- "purple" -->
+          <text x="80" y="91" text-anchor="middle" font-family="'Lilita One', cursive" font-size="14" fill="#C060FF" font-style="italic" letter-spacing="1">purple</text>
+
+          <!-- "CLUSTER" gradient, in front of planet -->
+          <text x="80" y="127" text-anchor="middle" font-family="'Lilita One', cursive" font-size="19" fill="url(#mcluster)" letter-spacing="1.5" stroke="rgba(0,0,0,0.4)" stroke-width="3" paint-order="stroke">CLUSTER</text>
+
+          <!-- Flavor band -->
+          <rect x="18" y="168" width="124" height="36" fill="rgba(0,0,0,0.3)" clip-path="url(#mcanclip)"/>
+          <rect x="18" y="168" width="124" height="36" fill="rgba(255,255,255,0.05)" clip-path="url(#mcanclip)"/>
+          <text x="80" y="179" text-anchor="middle" font-family="'Fredoka One', cursive" font-size="8" fill="rgba(255,255,255,0.6)" letter-spacing="3">GOÛT</text>
+          <text x="80" y="197" text-anchor="middle" font-family="'Lilita One', cursive" font-size="18" fill="#FFFFFF" letter-spacing="2" stroke="rgba(180,0,30,0.6)" stroke-width="2" paint-order="stroke">MARS</text>
+        </svg>
+      </div>
+      <h3>Mars Audacieuse & Électrique</h3>
+      <p>Fruit de la passion pétillant, poivre rouge vif et hibiscus acidulé — une explosion d'énergie venue des dunes rouges.</p>
+      <a href="#" class="flavor-link">Explorer la saveur →</a>
+    </div>
+
+    <!-- VENUS -->
+    <div class="flavor-card venus reveal">
+      <div class="flavor-card-stars">
+        <canvas class="card-stars-canvas"></canvas>
+      </div>
+      <div class="can-container">
+        <!-- VENUS CAN SVG -->
+        <svg viewBox="0 0 160 260" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+          <defs>
+            <linearGradient id="vbody" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#D888B0"/>
+              <stop offset="18%" stop-color="#ECA8C8"/>
+              <stop offset="45%" stop-color="#FFD0E4"/>
+              <stop offset="65%" stop-color="#FFB6C8"/>
+              <stop offset="85%" stop-color="#E898B8"/>
+              <stop offset="100%" stop-color="#C070A0"/>
+            </linearGradient>
+            <linearGradient id="vtop" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#D0D0D0"/>
+              <stop offset="40%" stop-color="#A8A8A8"/>
+              <stop offset="100%" stop-color="#707070"/>
+            </linearGradient>
+            <linearGradient id="vshine" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="rgba(255,255,255,0)"/>
+              <stop offset="30%" stop-color="rgba(255,255,255,0.22)"/>
+              <stop offset="50%" stop-color="rgba(255,255,255,0.10)"/>
+              <stop offset="100%" stop-color="rgba(0,0,0,0.1)"/>
+            </linearGradient>
+            <radialGradient id="vplanet" cx="38%" cy="35%" r="60%">
+              <stop offset="0%" stop-color="#FFE8F4"/>
+              <stop offset="50%" stop-color="#FFB6C8"/>
+              <stop offset="100%" stop-color="#C070A0"/>
+            </radialGradient>
+            <filter id="vglow">
+              <feGaussianBlur stdDeviation="2.5" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <clipPath id="vcanclip">
+              <rect x="18" y="22" width="124" height="218" rx="14" ry="14"/>
+            </clipPath>
+            <linearGradient id="vcluster" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#B040FF"/>
+              <stop offset="45%" stop-color="#D080FF"/>
+              <stop offset="75%" stop-color="#FFD700"/>
+              <stop offset="100%" stop-color="#FFE566"/>
+            </linearGradient>
+          </defs>
+
+          <rect x="18" y="22" width="124" height="218" rx="14" ry="14" fill="url(#vbody)"/>
+          <rect x="18" y="22" width="124" height="218" rx="14" ry="14" fill="url(#vshine)"/>
+          <rect x="32" y="22" width="22" height="218" fill="rgba(255,255,255,0.12)" clip-path="url(#vcanclip)"/>
+          <rect x="130" y="22" width="12" height="218" fill="rgba(0,0,0,0.12)" clip-path="url(#vcanclip)"/>
+
+          <ellipse cx="80" cy="22" rx="62" ry="11" fill="url(#vtop)"/>
+          <ellipse cx="80" cy="18" rx="38" ry="6" fill="#C0C0C0"/>
+          <ellipse cx="80" cy="16" rx="22" ry="4" fill="#D8D8D8"/>
+          <rect x="74" y="10" width="12" height="8" rx="3" fill="#B0B0B0" stroke="#888" stroke-width="0.5"/>
+          <ellipse cx="80" cy="10" rx="5" ry="2.5" fill="#999"/>
+
+          <ellipse cx="80" cy="240" rx="62" ry="11" fill="#888"/>
+          <ellipse cx="80" cy="243" rx="54" ry="7" fill="#707070"/>
+
+          <!-- Badge -->
+          <circle cx="80" cy="115" r="44" fill="rgba(255,255,255,0.12)"/>
+          <circle cx="80" cy="115" r="42" fill="rgba(200,100,140,0.35)" stroke="rgba(255,182,200,0.6)" stroke-width="1.5"/>
+
+          <!-- Planet -->
+          <circle cx="80" cy="115" r="28" fill="url(#vplanet)" filter="url(#vglow)"/>
+
+          <!-- Ring -->
+          <ellipse cx="80" cy="115" rx="40" ry="10" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="3.5"/>
+          <ellipse cx="80" cy="115" rx="40" ry="10" fill="none" stroke="rgba(255,182,200,0.3)" stroke-width="6"/>
+          <path d="M 44 115 Q 80 103 116 115" fill="rgba(200,110,140,0.6)" stroke="none"/>
+
+          <!-- Stars -->
+          <circle cx="50" cy="82" r="1.8" fill="#FFE566" opacity="0.95"/>
+          <circle cx="110" cy="88" r="1.4" fill="#FFB830" opacity="0.9"/>
+          <circle cx="44" cy="138" r="1.2" fill="#9B2FBE" opacity="0.8"/>
+          <circle cx="116" cy="142" r="1.6" fill="#FFE566" opacity="0.9"/>
+          <circle cx="62" cy="76" r="1" fill="#FF9820" opacity="0.8"/>
+          <circle cx="98" cy="78" r="1.2" fill="#FFB830" opacity="0.8"/>
+          <circle cx="55" cy="152" r="1.1" fill="#FFE566" opacity="0.75"/>
+          <circle cx="106" cy="155" r="1.3" fill="#FF9820" opacity="0.7"/>
+          <circle cx="37" cy="100" r="1" fill="#FFE566" opacity="0.7"/>
+          <circle cx="122" cy="105" r="1.1" fill="#FFB830" opacity="0.8"/>
+          <circle cx="42" cy="125" r="0.9" fill="#FF9820" opacity="0.65"/>
+          <circle cx="118" cy="128" r="1" fill="#FFE566" opacity="0.7"/>
+          <g transform="translate(48,86)" fill="#FFE566" opacity="0.95">
+            <polygon points="0,-4 1,-1 4,0 1,1 0,4 -1,1 -4,0 -1,-1"/>
+          </g>
+          <g transform="translate(112,90)" fill="#FFB830" opacity="0.9">
+            <polygon points="0,-3.5 0.9,-0.9 3.5,0 0.9,0.9 0,3.5 -0.9,0.9 -3.5,0 -0.9,-0.9"/>
+          </g>
+          <g transform="translate(40,115)" fill="#FF9820" opacity="0.8">
+            <polygon points="0,-3 0.7,-0.7 3,0 0.7,0.7 0,3 -0.7,0.7 -3,0 -0.7,-0.7"/>
+          </g>
+          <g transform="translate(120,118)" fill="#FFE566" opacity="0.85">
+            <polygon points="0,-3 0.7,-0.7 3,0 0.7,0.7 0,3 -0.7,0.7 -3,0 -0.7,-0.7"/>
+          </g>
+
+          <!-- "purple" -->
+          <text x="80" y="91" text-anchor="middle" font-family="'Lilita One', cursive" font-size="14" fill="#7B2FBE" font-style="italic" letter-spacing="1">purple</text>
+
+          <!-- "CLUSTER" gradient, in front of planet -->
+          <text x="80" y="127" text-anchor="middle" font-family="'Lilita One', cursive" font-size="19" fill="url(#vcluster)" letter-spacing="1.5" stroke="rgba(255,255,255,0.5)" stroke-width="3" paint-order="stroke">CLUSTER</text>
+
+          <!-- Flavor band -->
+          <rect x="18" y="168" width="124" height="36" fill="rgba(123,47,190,0.25)" clip-path="url(#vcanclip)"/>
+          <text x="80" y="179" text-anchor="middle" font-family="'Fredoka One', cursive" font-size="8" fill="rgba(123,47,190,0.8)" letter-spacing="3">GOÛT</text>
+          <text x="80" y="197" text-anchor="middle" font-family="'Lilita One', cursive" font-size="16" fill="#7B2FBE" letter-spacing="2" stroke="rgba(255,255,255,0.5)" stroke-width="2" paint-order="stroke">VÉNUS</text>
+        </svg>
+      </div>
+      <h3>Vénus Légère & Éthérée</h3>
+      <p>Pêche pâle, fleurs de sureau, vanille douce et citron frais — une douceur aérienne venue des nuages de Vénus.</p>
+      <a href="#" class="flavor-link">Explorer la saveur →</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- COSMOS SECTION -->
+<section class="cosmos" id="cosmos">
+  <div class="cosmos-bg" id="cosmos-bg"></div>
+
+  <div class="cosmos-content reveal">
+    <span class="section-label">Le Cosmos</span>
+    <h2>Là où la saveur rencontre l'infini</h2>
+    <p class="section-subtitle">Purple Cluster t'apporte le goût des astres lointains. Explore chaque planète et découvre l'histoire qui se cache dans chaque gorgée.</p>
+  </div>
+
+  <!-- PLANET CAROUSEL -->
+  <div class="planet-carousel reveal">
+
+    <!-- Arrow Left -->
+    <button class="carousel-arrow arrow-left" onclick="carouselNav(-1)" aria-label="Planète précédente">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M16 8 L10 14 L16 20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <!-- Carousel Track -->
+    <div class="carousel-track" id="carousel-track">
+
+      <!-- JUPITER SLIDE -->
+      <div class="planet-slide" data-planet="0">
+        <div class="planet-scene">
+          <!-- Orbiting moon -->
+          <div class="orbit-path">
+            <div class="orbit-moon jupiter-moon"></div>
+          </div>
+          <!-- Ring BACK (behind planet) -->
+          <svg class="planet-ring-svg" width="300" height="120" viewBox="-150 -60 300 120" style="z-index:1;">
+            <ellipse cx="0" cy="0" rx="130" ry="32" fill="none" stroke="rgba(192,96,255,0.3)" stroke-width="10"/>
+            <ellipse cx="0" cy="0" rx="130" ry="32" fill="none" stroke="rgba(192,96,255,0.55)" stroke-width="4"/>
+          </svg>
+          <!-- Planet sphere (z-index:2 from CSS) -->
+          <div class="planet-sphere jupiter-sphere">
+            <div class="planet-band band-j1"></div>
+            <div class="planet-band band-j2"></div>
+            <div class="planet-shine"></div>
+          </div>
+          <!-- Ring FRONT (in front of planet, clips lower half) -->
+          <svg class="planet-ring-svg" width="300" height="120" viewBox="-150 -60 300 120" style="z-index:4;">
+            <defs>
+              <clipPath id="ring-front-j">
+                <rect x="-150" y="0" width="300" height="60"/>
+              </clipPath>
+            </defs>
+            <ellipse cx="0" cy="0" rx="130" ry="32" fill="none" stroke="rgba(192,96,255,0.3)" stroke-width="10" clip-path="url(#ring-front-j)"/>
+            <ellipse cx="0" cy="0" rx="130" ry="32" fill="none" stroke="rgba(230,160,255,0.7)" stroke-width="4" clip-path="url(#ring-front-j)"/>
+          </svg>
+          <!-- Particles -->
+          <div class="planet-particle pp1" style="--c:#C060FF;--d:3.2s;top:18%;left:12%"></div>
+          <div class="planet-particle pp2" style="--c:#FFE566;--d:2.1s;top:72%;left:80%"></div>
+          <div class="planet-particle pp3" style="--c:#C060FF;--d:4s;top:55%;left:8%"></div>
+          <div class="planet-particle pp4" style="--c:#FFE566;--d:1.8s;top:20%;left:78%"></div>
+          <div class="planet-particle pp5" style="--c:#fff;--d:3s;top:82%;left:22%"></div>
+          <!-- Stars around planet -->
+          <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5;" viewBox="0 0 300 300">
+            <circle cx="30" cy="40" r="2.5" fill="#FFE566" opacity="0.9"/>
+            <circle cx="260" cy="55" r="2" fill="#FFB830" opacity="0.85"/>
+            <circle cx="18" cy="180" r="1.8" fill="#FFE566" opacity="0.75"/>
+            <circle cx="278" cy="200" r="2.2" fill="#FFB830" opacity="0.8"/>
+            <circle cx="50" cy="250" r="1.5" fill="#FFE566" opacity="0.7"/>
+            <circle cx="240" cy="260" r="1.8" fill="#FFB830" opacity="0.65"/>
+            <polygon points="270,90 272,96 278,96 273,100 275,106 270,102 265,106 267,100 262,96 268,96" fill="#FFE566" opacity="0.85" transform="scale(0.7) translate(116,60)"/>
+            <polygon points="270,90 272,96 278,96 273,100 275,106 270,102 265,106 267,100 262,96 268,96" fill="#FFB830" opacity="0.75" transform="scale(0.55) translate(-170,290)"/>
+          </svg>
+        </div>
+        <div class="planet-info">
+          <div class="planet-badge jupiter-badge">✦ JUPITER</div>
+          <h3 class="planet-name">La Planète des Profondeurs</h3>
+          <p class="planet-story">
+            Au cœur de Jupiter, des tempêtes vieilles de millénaires brassent des arômes enfouis depuis la nuit des temps. C'est là, dans ses couches de nuages violets tourbillonnants, qu'est née la recette secrète de Purple Cluster Jupiter. Chaque gorgée libère une onde de <strong>lime acidulée</strong>, de <strong>gingembre sauvage</strong> et de <strong>clous de girofle</strong> — exactement comme ces vents titanesques qui soufflent à 600 km/h sur la Grande Tache Rouge.
+          </p>
+          <div class="planet-tags">
+            <span class="ptag">🍋 Lime</span>
+            <span class="ptag">🫚 Gingembre</span>
+            <span class="ptag">🌶 Clou de girofle</span>
+          </div>
+          <a href="#" class="btn btn-primary" style="margin-top:24px;display:inline-block;">Explorer Jupiter →</a>
+        </div>
+      </div>
+
+      <!-- MARS SLIDE -->
+      <div class="planet-slide" data-planet="1" style="display:none">
+        <div class="planet-scene">
+          <div class="orbit-path orbit-fast">
+            <div class="orbit-moon mars-moon"></div>
+          </div>
+          <svg class="planet-ring-svg" width="300" height="120" viewBox="-150 -60 300 120" style="z-index:1;">
+            <ellipse cx="0" cy="0" rx="130" ry="32" fill="none" stroke="rgba(255,56,80,0.25)" stroke-width="10"/>
+            <ellipse cx="0" cy="0" rx="130" ry="32" fill="none" stroke="rgba(255,80,80,0.5)" stroke-width="4"/>
+          </svg>
+          <div class="planet-sphere mars-sphere">
+            <div class="planet-band band-m1"></div>
+            <div class="planet-band band-m2"></div>
+            <div class="planet-shine"></div>
+          </div>
+          <svg class="planet-ring-svg" width="300" height="120" viewBox="-150 -60 300 120" style="z-index:4;">
+            <defs>
+              <clipPath id="ring-front-m">
+                <rect x="-150" y="0" width="300" height="60"/>
+              </clipPath>
+            </defs>
+            <ellipse cx="0" cy="0" rx="130" ry="32" fill="none" stroke="rgba(255,56,80,0.25)" stroke-width="10" clip-path="url(#ring-front-m)"/>
+            <ellipse cx="0" cy="0" rx="130" ry="32" fill="none" stroke="rgba(255,130,110,0.7)" stroke-width="4" clip-path="url(#ring-front-m)"/>
+          </svg>
+          <div class="planet-particle" style="--c:#FF5070;--d:2.8s;top:15%;left:15%"></div>
+          <div class="planet-particle" style="--c:#FFE566;--d:1.9s;top:75%;left:82%"></div>
+          <div class="planet-particle" style="--c:#FF5070;--d:3.5s;top:60%;left:6%"></div>
+          <div class="planet-particle" style="--c:#fff;--d:2.2s;top:22%;left:76%"></div>
+          <div class="planet-particle" style="--c:#FFE566;--d:4.2s;top:85%;left:28%"></div>
+          <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5;" viewBox="0 0 300 300">
+            <circle cx="28" cy="42" r="2.5" fill="#FFE566" opacity="0.9"/>
+            <circle cx="265" cy="52" r="2" fill="#FFB830" opacity="0.85"/>
+            <circle cx="15" cy="185" r="1.8" fill="#FFE566" opacity="0.75"/>
+            <circle cx="280" cy="205" r="2.2" fill="#FF9030" opacity="0.8"/>
+            <circle cx="52" cy="255" r="1.5" fill="#FFE566" opacity="0.7"/>
+            <circle cx="245" cy="262" r="1.8" fill="#FFB830" opacity="0.65"/>
+            <polygon points="270,90 272,96 278,96 273,100 275,106 270,102 265,106 267,100 262,96 268,96" fill="#FFB830" opacity="0.85" transform="scale(0.7) translate(116,60)"/>
+            <polygon points="270,90 272,96 278,96 273,100 275,106 270,102 265,106 267,100 262,96 268,96" fill="#FFE566" opacity="0.7" transform="scale(0.55) translate(-165,295)"/>
+          </svg>
+        </div>
+        <div class="planet-info">
+          <div class="planet-badge mars-badge">✦ MARS</div>
+          <h3 class="planet-name">La Planète de l'Électricité</h3>
+          <p class="planet-story">
+            Les tempêtes de poussière rouge de Mars ont quelque chose d'électrique. Dans ces canyons cramoisie aux falaises de 8 km, chaque grain de sable porte une charge. C'est cette même énergie brute que Purple Cluster a capturée dans Mars : une explosion de <strong>fruit de la passion</strong> pétillant, une vague d'<strong>hibiscus</strong> acidulé et une pointe de <strong>poivre rouge</strong> qui réveille les sens comme un orage martien.
+          </p>
+          <div class="planet-tags">
+            <span class="ptag" style="border-color:rgba(255,80,80,0.4);color:#FF9090;">🌺 Hibiscus</span>
+            <span class="ptag" style="border-color:rgba(255,80,80,0.4);color:#FF9090;">🍊 Fruit de la passion</span>
+            <span class="ptag" style="border-color:rgba(255,80,80,0.4);color:#FF9090;">🌶 Poivre rouge</span>
+          </div>
+          <a href="#" class="btn btn-primary" style="margin-top:24px;display:inline-block;background:linear-gradient(135deg,#FF3860,#FF1A60);">Explorer Mars →</a>
+        </div>
+      </div>
+
+      <!-- VENUS SLIDE -->
+      <div class="planet-slide" data-planet="2" style="display:none">
+        <div class="planet-scene">
+          <div class="orbit-path orbit-slow">
+            <div class="orbit-moon venus-moon"></div>
+          </div>
+          <svg class="planet-ring-svg" width="300" height="120" viewBox="-150 -60 300 120" style="z-index:1;">
+            <ellipse cx="0" cy="0" rx="130" ry="32" fill="none" stroke="rgba(255,182,200,0.25)" stroke-width="10"/>
+            <ellipse cx="0" cy="0" rx="130" ry="32" fill="none" stroke="rgba(255,182,200,0.55)" stroke-width="4"/>
+          </svg>
+          <div class="planet-sphere venus-sphere">
+            <div class="planet-band band-v1"></div>
+            <div class="planet-band band-v2"></div>
+            <div class="planet-shine"></div>
+          </div>
+          <svg class="planet-ring-svg" width="300" height="120" viewBox="-150 -60 300 120" style="z-index:4;">
+            <defs>
+              <clipPath id="ring-front-v">
+                <rect x="-150" y="0" width="300" height="60"/>
+              </clipPath>
+            </defs>
+            <ellipse cx="0" cy="0" rx="130" ry="32" fill="none" stroke="rgba(255,182,200,0.25)" stroke-width="10" clip-path="url(#ring-front-v)"/>
+            <ellipse cx="0" cy="0" rx="130" ry="32" fill="none" stroke="rgba(255,220,235,0.75)" stroke-width="4" clip-path="url(#ring-front-v)"/>
+          </svg>
+          <div class="planet-particle" style="--c:#FFB6C8;--d:3.8s;top:12%;left:18%"></div>
+          <div class="planet-particle" style="--c:#FFE566;--d:2.4s;top:78%;left:78%"></div>
+          <div class="planet-particle" style="--c:#FFB6C8;--d:4.5s;top:65%;left:10%"></div>
+          <div class="planet-particle" style="--c:#fff;--d:1.7s;top:25%;left:74%"></div>
+          <div class="planet-particle" style="--c:#FFE566;--d:3.1s;top:88%;left:34%"></div>
+          <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5;" viewBox="0 0 300 300">
+            <circle cx="32" cy="38" r="2.5" fill="#FFE566" opacity="0.9"/>
+            <circle cx="262" cy="50" r="2" fill="#FFB830" opacity="0.85"/>
+            <circle cx="20" cy="188" r="1.8" fill="#FFE566" opacity="0.75"/>
+            <circle cx="276" cy="202" r="2.2" fill="#FFB830" opacity="0.8"/>
+            <circle cx="48" cy="258" r="1.5" fill="#FFE566" opacity="0.7"/>
+            <circle cx="248" cy="258" r="1.8" fill="#FF9030" opacity="0.65"/>
+            <polygon points="270,90 272,96 278,96 273,100 275,106 270,102 265,106 267,100 262,96 268,96" fill="#FFE566" opacity="0.85" transform="scale(0.7) translate(116,60)"/>
+            <polygon points="270,90 272,96 278,96 273,100 275,106 270,102 265,106 267,100 262,96 268,96" fill="#FFB830" opacity="0.72" transform="scale(0.55) translate(-168,292)"/>
+          </svg>
+        </div>
+        <div class="planet-info">
+          <div class="planet-badge venus-badge">✦ VÉNUS</div>
+          <h3 class="planet-name">La Planète des Nuages</h3>
+          <p class="planet-story">
+            Vénus est enveloppée de nuages nacrés qui flottent comme de la soie dans une lumière dorée. C'est la plus douce des planètes, celle qui brille le plus fort dans le ciel du soir. Purple Cluster Vénus a capturé cette légèreté éthérée : une caresse de <strong>pêche blanche</strong>, un souffle de <strong>fleurs de sureau</strong> et une note de <strong>vanille</strong> qui s'évanouit doucement, laissant juste une trace lumineuse.
+          </p>
+          <div class="planet-tags">
+            <span class="ptag" style="border-color:rgba(200,100,160,0.4);color:#E0A0C8;">🍑 Pêche blanche</span>
+            <span class="ptag" style="border-color:rgba(200,100,160,0.4);color:#E0A0C8;">🌸 Fleurs de sureau</span>
+            <span class="ptag" style="border-color:rgba(200,100,160,0.4);color:#E0A0C8;">🍦 Vanille</span>
+          </div>
+          <a href="#" class="btn btn-primary" style="margin-top:24px;display:inline-block;background:linear-gradient(135deg,#E890B8,#C060A0);">Explorer Vénus →</a>
+        </div>
+      </div>
+
+    </div><!-- end track -->
+
+    <!-- Arrow Right -->
+    <button class="carousel-arrow arrow-right" onclick="carouselNav(1)" aria-label="Planète suivante">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M12 8 L18 14 L12 20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+  </div><!-- end carousel -->
+
+  <!-- Dots -->
+  <div class="carousel-dots">
+    <button class="cdot active" onclick="carouselGo(0)"></button>
+    <button class="cdot" onclick="carouselGo(1)"></button>
+    <button class="cdot" onclick="carouselGo(2)"></button>
+  </div>
+
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials" id="voices">
+  <span class="section-label">Vraies voix</span>
+  <h2 class="reveal">Ce que disent<br>les explorateurs</h2>
+  <p class="section-subtitle reveal">Ce que les gens disent après leur première rencontre cosmique.</p>
+
+  <div class="testi-grid">
+    <div class="testi-card reveal">
+      <div class="testi-platform">
+        <span class="testi-logo">✦ WebAvis</span>
+        <span class="testi-stars">★★★★★</span>
+      </div>
+      <blockquote>"C'est comme flotter dans l'espace — une boisson complètement hors du commun. La saveur Jupiter m'a transporté."</blockquote>
+      <div class="testi-author">
+        <div class="testi-avatar" style="background:linear-gradient(135deg,#7B2FBE,#C060FF);">🧑</div>
+        <div class="testi-info">
+          <strong>Alex Rivière</strong>
+          <span>Étudiant · Lyon</span>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card reveal">
+      <div class="testi-platform">
+        <span class="testi-logo">✦ WebAvis</span>
+        <span class="testi-stars">★★★★★</span>
+      </div>
+      <blockquote>"Les saveurs sont différentes de tout ce que j'ai jamais goûté. Mars est absolument électrique !"</blockquote>
+      <div class="testi-author">
+        <div class="testi-avatar" style="background:linear-gradient(135deg,#FF3860,#FF4DA6);">👩</div>
+        <div class="testi-info">
+          <strong>Jordan Leroy</strong>
+          <span>Créatrice de contenu · Paris</span>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card reveal">
+      <div class="testi-platform">
+        <span class="testi-logo">✦ WebAvis</span>
+        <span class="testi-stars">★★★★★</span>
+      </div>
+      <blockquote>"Cette boisson a complètement changé mon quotidien. Vénus est douce comme un nuage — incroyable."</blockquote>
+      <div class="testi-author">
+        <div class="testi-avatar" style="background:linear-gradient(135deg,#FFB6C1,#FF4DA6);">🧑</div>
+        <div class="testi-info">
+          <strong>Casey Morgan</strong>
+          <span>Designeuse · Bordeaux</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="discover">
+  <div class="cta-bg"></div>
+  <div class="cta-content reveal">
+    <span class="section-label">Rejoins le mouvement</span>
+    <h2>Rejoins le mouvement cosmique</h2>
+    <p class="section-subtitle">Découvre les trois saveurs et rejoins-nous pour du contenu exclusif, des drops en édition limitée et des offres cosmiques.</p>
+    <div style="display:flex;gap:16px;justify-content:center;">
+      <a href="#" class="btn btn-primary">🚀 Découvrir</a>
+      <a href="#" class="btn btn-outline">Nous suivre</a>
+    </div>
+  </div>
+
+  <div class="cta-visual reveal">
+    <div class="orbit-ring orbit-1"><div class="orbit-dot"></div></div>
+    <div class="orbit-ring orbit-2"></div>
+    <div class="cta-cans">
+      <!-- Jupiter mini -->
+      <svg width="80" height="140" viewBox="0 0 160 260" style="transform:rotate(-5deg);filter:drop-shadow(0 16px 32px rgba(0,0,0,0.6))">
+        <defs>
+          <linearGradient id="cjb" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#3D006B"/><stop offset="45%" stop-color="#9B2FE8"/><stop offset="100%" stop-color="#2D0050"/>
+          </linearGradient>
+          <linearGradient id="cjc" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#B040FF"/><stop offset="55%" stop-color="#D080FF"/><stop offset="100%" stop-color="#FFE566"/>
+          </linearGradient>
+          <radialGradient id="cjp" cx="38%" cy="35%" r="60%">
+            <stop offset="0%" stop-color="#E0A0FF"/><stop offset="100%" stop-color="#3D0066"/>
+          </radialGradient>
+          <clipPath id="cjclip"><rect x="18" y="22" width="124" height="218" rx="14"/></clipPath>
+        </defs>
+        <rect x="18" y="22" width="124" height="218" rx="14" fill="url(#cjb)"/>
+        <rect x="32" y="22" width="22" height="218" fill="rgba(255,255,255,0.07)" clip-path="url(#cjclip)"/>
+        <ellipse cx="80" cy="22" rx="62" ry="11" fill="#B0B0B0"/>
+        <ellipse cx="80" cy="240" rx="62" ry="11" fill="#666"/>
+        <circle cx="80" cy="115" r="42" fill="rgba(61,0,102,0.5)" stroke="rgba(192,96,255,0.4)" stroke-width="1.5"/>
+        <circle cx="80" cy="115" r="28" fill="url(#cjp)"/>
+        <ellipse cx="80" cy="115" rx="40" ry="10" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="3"/>
+        <path d="M 44 115 Q 80 103 116 115" fill="rgba(61,0,102,0.7)"/>
+        <circle cx="50" cy="85" r="1.5" fill="#FFE566" opacity="0.9"/>
+        <circle cx="110" cy="90" r="1.2" fill="#FFE566" opacity="0.8"/>
+        <circle cx="45" cy="140" r="1" fill="#fff" opacity="0.7"/>
+        <circle cx="115" cy="145" r="1.2" fill="#FFE566" opacity="0.8"/>
+        <text x="80" y="92" text-anchor="middle" font-family="'Lilita One',cursive" font-size="14" fill="#C060FF" font-style="italic">purple</text>
+        <text x="80" y="128" text-anchor="middle" font-family="'Lilita One',cursive" font-size="19" fill="url(#cjc)" stroke="rgba(0,0,0,0.4)" stroke-width="3" paint-order="stroke" letter-spacing="1.5">CLUSTER</text>
+        <text x="80" y="197" text-anchor="middle" font-family="'Lilita One',cursive" font-size="16" fill="#FFE566" letter-spacing="2" stroke="rgba(0,0,0,0.5)" stroke-width="2" paint-order="stroke">JUPITER</text>
+      </svg>
+
+      <!-- Mars mini (center, bigger) -->
+      <svg width="96" height="168" viewBox="0 0 160 260" style="transform:scale(1.05);filter:drop-shadow(0 20px 40px rgba(0,0,0,0.7))">
+        <defs>
+          <linearGradient id="cmb" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#AA0030"/><stop offset="45%" stop-color="#FF5070"/><stop offset="100%" stop-color="#880020"/>
+          </linearGradient>
+          <linearGradient id="cmc" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#B040FF"/><stop offset="55%" stop-color="#D080FF"/><stop offset="100%" stop-color="#FFE566"/>
+          </linearGradient>
+          <radialGradient id="cmp" cx="38%" cy="35%" r="60%">
+            <stop offset="0%" stop-color="#FF9090"/><stop offset="100%" stop-color="#880020"/>
+          </radialGradient>
+          <clipPath id="cmclip"><rect x="18" y="22" width="124" height="218" rx="14"/></clipPath>
+        </defs>
+        <rect x="18" y="22" width="124" height="218" rx="14" fill="url(#cmb)"/>
+        <rect x="32" y="22" width="22" height="218" fill="rgba(255,255,255,0.07)" clip-path="url(#cmclip)"/>
+        <ellipse cx="80" cy="22" rx="62" ry="11" fill="#B0B0B0"/>
+        <ellipse cx="80" cy="240" rx="62" ry="11" fill="#555"/>
+        <circle cx="80" cy="115" r="42" fill="rgba(100,0,30,0.5)" stroke="rgba(255,80,80,0.4)" stroke-width="1.5"/>
+        <circle cx="80" cy="115" r="28" fill="url(#cmp)"/>
+        <ellipse cx="80" cy="115" rx="40" ry="10" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="3"/>
+        <path d="M 44 115 Q 80 103 116 115" fill="rgba(100,0,20,0.7)"/>
+        <circle cx="50" cy="85" r="1.5" fill="#FFE566" opacity="0.9"/>
+        <circle cx="110" cy="90" r="1.2" fill="#FFE566" opacity="0.8"/>
+        <circle cx="45" cy="140" r="1" fill="#fff" opacity="0.7"/>
+        <circle cx="115" cy="145" r="1.2" fill="#FFE566" opacity="0.8"/>
+        <text x="80" y="92" text-anchor="middle" font-family="'Lilita One',cursive" font-size="14" fill="#C060FF" font-style="italic">purple</text>
+        <text x="80" y="128" text-anchor="middle" font-family="'Lilita One',cursive" font-size="19" fill="url(#cmc)" stroke="rgba(0,0,0,0.4)" stroke-width="3" paint-order="stroke" letter-spacing="1.5">CLUSTER</text>
+        <text x="80" y="197" text-anchor="middle" font-family="'Lilita One',cursive" font-size="18" fill="#FFFFFF" letter-spacing="2" stroke="rgba(180,0,30,0.5)" stroke-width="2" paint-order="stroke">MARS</text>
+      </svg>
+
+      <!-- Venus mini -->
+      <svg width="80" height="140" viewBox="0 0 160 260" style="transform:rotate(5deg);filter:drop-shadow(0 16px 32px rgba(0,0,0,0.6))">
+        <defs>
+          <linearGradient id="cvb" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#D888B0"/><stop offset="45%" stop-color="#FFD0E4"/><stop offset="100%" stop-color="#C070A0"/>
+          </linearGradient>
+          <linearGradient id="cvc" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#B040FF"/><stop offset="55%" stop-color="#D080FF"/><stop offset="100%" stop-color="#FFE566"/>
+          </linearGradient>
+          <radialGradient id="cvp" cx="38%" cy="35%" r="60%">
+            <stop offset="0%" stop-color="#FFE8F4"/><stop offset="100%" stop-color="#C070A0"/>
+          </radialGradient>
+          <clipPath id="cvclip"><rect x="18" y="22" width="124" height="218" rx="14"/></clipPath>
+        </defs>
+        <rect x="18" y="22" width="124" height="218" rx="14" fill="url(#cvb)"/>
+        <rect x="32" y="22" width="22" height="218" fill="rgba(255,255,255,0.12)" clip-path="url(#cvclip)"/>
+        <ellipse cx="80" cy="22" rx="62" ry="11" fill="#B8B8B8"/>
+        <ellipse cx="80" cy="240" rx="62" ry="11" fill="#888"/>
+        <circle cx="80" cy="115" r="42" fill="rgba(200,100,140,0.3)" stroke="rgba(255,182,200,0.5)" stroke-width="1.5"/>
+        <circle cx="80" cy="115" r="28" fill="url(#cvp)"/>
+        <ellipse cx="80" cy="115" rx="40" ry="10" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="3"/>
+        <path d="M 44 115 Q 80 103 116 115" fill="rgba(200,110,140,0.6)"/>
+        <circle cx="50" cy="85" r="1.5" fill="#FFE566" opacity="0.9"/>
+        <circle cx="110" cy="90" r="1.2" fill="#FFE566" opacity="0.8"/>
+        <circle cx="45" cy="140" r="1" fill="#9B2FBE" opacity="0.8"/>
+        <circle cx="115" cy="145" r="1.2" fill="#FFE566" opacity="0.8"/>
+        <text x="80" y="92" text-anchor="middle" font-family="'Lilita One',cursive" font-size="14" fill="#7B2FBE" font-style="italic">purple</text>
+        <text x="80" y="128" text-anchor="middle" font-family="'Lilita One',cursive" font-size="19" fill="url(#cvc)" stroke="rgba(255,255,255,0.5)" stroke-width="3" paint-order="stroke" letter-spacing="1.5">CLUSTER</text>
+        <text x="80" y="197" text-anchor="middle" font-family="'Lilita One',cursive" font-size="15" fill="#7B2FBE" letter-spacing="2" stroke="rgba(255,255,255,0.5)" stroke-width="2" paint-order="stroke">VÉNUS</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="footer">
+  <div class="footer-top">
+    <div class="footer-brand">
+      <span class="nav-logo">purple✦CLUSTER</span>
+      <p>Suis-nous sur Instagram et TikTok pour des drops exclusifs et des mises à jour cosmiques.</p>
+      <div class="social-links">
+        <a class="social-link" href="#">📷</a>
+        <a class="social-link" href="#">🎵</a>
+        <a class="social-link" href="#">🐦</a>
+        <a class="social-link" href="#">▶️</a>
+        <a class="social-link" href="#">📘</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Notre univers</h4>
+      <ul>
+        <li><a href="#">Notre histoire</a></li>
+        <li><a href="#">Les saveurs</a></li>
+        <li><a href="#">Profil saveur</a></li>
+        <li><a href="#">Presse &amp; médias</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Durabilité</h4>
+      <ul>
+        <li><a href="#">Notre engagement</a></li>
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Grossiste</a></li>
+        <li><a href="#">Partenariats</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="#">Contact &amp; social</a></li>
+        <li><a href="#">Communauté</a></li>
+        <li><a href="#">Créateurs</a></li>
+        <li><a href="#">Support</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#">Mentions légales</a></li>
+        <li><a href="#">Confidentialité</a></li>
+        <li><a href="#">CGV</a></li>
+        <li><a href="#">Cookies</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Purple Cluster. Tous droits réservés.</p>
+    <div class="footer-legal">
+      <a href="#">Politique de confidentialité</a>
+      <a href="#">Conditions d'utilisation</a>
+      <a href="#">Paramètres cookies</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* ── STARFIELD ── */
+  const canvas = document.getElementById('stars-canvas');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function initStars() {
+    stars = [];
+    for (let i = 0; i < 280; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.8,
+        opacity: Math.random(),
+        speed: 0.002 + Math.random() * 0.008,
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+  }
+
+  let t = 0;
+  function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    t += 0.01;
+    stars.forEach(s => {
+      const o = 0.3 + 0.7 * Math.abs(Math.sin(t * s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(220,180,255,${o})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+
+  window.addEventListener('resize', () => { resize(); initStars(); });
+  resize();
+  initStars();
+  drawStars();
+
+  /* ── SCROLL REVEAL ── */
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  reveals.forEach(el => observer.observe(el));
+
+  /* ── PLANET CAROUSEL ── */
+  const slides = document.querySelectorAll('.planet-slide');
+  const dots = document.querySelectorAll('.cdot');
+  const cosmosBg = document.getElementById('cosmos-bg');
+
+  const bgColors = [
+    'radial-gradient(ellipse 70% 70% at 50% 50%, rgba(61,0,102,0.45) 0%, transparent 70%)',
+    'radial-gradient(ellipse 70% 70% at 50% 50%, rgba(120,0,30,0.35) 0%, transparent 70%)',
+    'radial-gradient(ellipse 70% 70% at 50% 50%, rgba(160,60,100,0.3) 0%, transparent 70%)'
+  ];
+
+  let current = 0;
+
+  function carouselGo(idx, dir = 1) {
+    slides[current].style.display = 'none';
+    dots[current].classList.remove('active');
+    current = (idx + slides.length) % slides.length;
+    slides[current].style.display = 'flex';
+    slides[current].classList.remove('slide-from-left');
+    void slides[current].offsetWidth; // reflow
+    slides[current].style.animation = 'none';
+    void slides[current].offsetWidth;
+    slides[current].style.animation = dir >= 0 ? '' : 'slideInLeft 0.5s ease';
+    if (dir < 0) slides[current].classList.add('slide-from-left');
+    dots[current].classList.add('active');
+    cosmosBg.style.background = bgColors[current];
+  }
+
+  function carouselNav(dir) { carouselGo(current + dir, dir); }
+
+  // Init bg
+  cosmosBg.style.background = bgColors[0];
+
+  /* ── NAV STARS ── */
+  (function() {
+    const nc = document.getElementById('nav-stars-canvas');
+    const NAV_COLORS = ['#FFE566', '#FFB830', '#FF9820', '#FFD700', '#FFC040'];
+    const NAV_COUNT  = 55;
+
+    function initNav() {
+      const dpr  = window.devicePixelRatio || 1;
+      const w    = nc.offsetParent ? nc.offsetParent.offsetWidth  : window.innerWidth;
+      const h    = nc.offsetParent ? nc.offsetParent.offsetHeight : 64;
+      nc.width   = w * dpr;
+      nc.height  = h * dpr;
+      nc.style.width  = w + 'px';
+      nc.style.height = h + 'px';
+      const ctx = nc.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      // Each star: position, size, blur radius, lifecycle
+      const stars = Array.from({ length: NAV_COUNT }, () => makeNavStar(w, h));
+      // Stagger initial phases so they don't all sync
+      stars.forEach((s, i) => { s.holdTimer = Math.floor((i / NAV_COUNT) * s.holdMax); s.state = 'hold'; s.alpha = 0.4 + Math.random() * 0.6; });
+
+      function makeNavStar(w, h) {
+        const isSpark = Math.random() > 0.5;
+        return {
+          x: rand(0, w), y: rand(0, h),
+          r:      isSpark ? rand(2.5, 5.5)  : rand(1.2, 3),
+          blur:   rand(1.5, 5),        // individual blur per star
+          color:  NAV_COLORS[Math.floor(Math.random() * NAV_COLORS.length)],
+          isSpark,
+          alpha: 0, state: 'fadein',
+          holdTimer: 0, holdMax: rand(80, 220),
+          fadeSpeed: rand(0.012, 0.028),
+        };
+      }
+
+      function drawNavSparkle(ctx, s) {
+        ctx.save();
+        ctx.filter = `blur(${s.blur}px)`;
+        ctx.globalAlpha = s.alpha;
+        ctx.fillStyle = s.color;
+        ctx.translate(s.x, s.y);
+        ctx.beginPath();
+        const pts = 8;
+        for (let i = 0; i < pts; i++) {
+          const a = (i * Math.PI) / 4;
+          const d = i % 2 === 0 ? s.r : s.r * 0.35;
+          if (i === 0) ctx.moveTo(Math.cos(a)*d, Math.sin(a)*d);
+          else         ctx.lineTo(Math.cos(a)*d, Math.sin(a)*d);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawNavDot(ctx, s) {
+        ctx.save();
+        ctx.filter = `blur(${s.blur}px)`;
+        ctx.globalAlpha = s.alpha;
+        ctx.fillStyle = s.color;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function tickNav() {
+        ctx.clearRect(0, 0, w, h);
+        stars.forEach(s => {
+          if (s.state === 'fadein') {
+            s.alpha += s.fadeSpeed;
+            if (s.alpha >= 1) { s.alpha = 1; s.state = 'hold'; s.holdTimer = 0; }
+          } else if (s.state === 'hold') {
+            s.holdTimer++;
+            s.alpha = 0.6 + 0.4 * Math.sin(s.holdTimer * 0.08);
+            if (s.holdTimer >= s.holdMax) s.state = 'fadeout';
+          } else {
+            s.alpha -= s.fadeSpeed;
+            if (s.alpha <= 0) {
+              const ns = makeNavStar(w, h);
+              Object.assign(s, ns);
+              s.alpha = 0; s.state = 'fadein';
+            }
+          }
+          s.isSpark ? drawNavSparkle(ctx, s) : drawNavDot(ctx, s);
+        });
+        requestAnimationFrame(tickNav);
+      }
+      tickNav();
+    }
+
+    window.addEventListener('load', initNav);
+    window.addEventListener('resize', () => { initNav(); });
+  })();
+
+
+  const STAR_COLORS = ['#FFE566', '#FFB830', '#FF9820', '#FFD700', '#FFC040'];
+  const STAR_COUNT  = 9; // visible at once per card
+
+  function rand(min, max) { return min + Math.random() * (max - min); }
+
+  // Draw a 4-point sparkle
+  function drawSparkle(ctx, x, y, r, color, alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = color;
+    ctx.translate(x, y);
+    ctx.beginPath();
+    for (let i = 0; i < 8; i++) {
+      const angle = (i * Math.PI) / 4;
+      const dist  = i % 2 === 0 ? r : r * 0.38;
+      if (i === 0) ctx.moveTo(Math.cos(angle) * dist, Math.sin(angle) * dist);
+      else         ctx.lineTo(Math.cos(angle) * dist, Math.sin(angle) * dist);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Draw a simple dot star
+  function drawDot(ctx, x, y, r, color, alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function makeCardStar(w, h) {
+    const isSpark = Math.random() > 0.45;
+    return {
+      x:       rand(6, w - 6),
+      y:       rand(6, h - 6),
+      r:       isSpark ? rand(3.5, 6) : rand(1.5, 3),
+      color:   STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
+      isSpark,
+      // lifecycle: each star fades in, holds, fades out then teleports
+      phase:   rand(0, Math.PI * 2),   // offset so all don't sync
+      speed:   rand(0.004, 0.011),
+      alpha:   0,
+      state:   'fadein', // fadein | hold | fadeout
+      holdTimer: 0,
+      holdMax:   rand(60, 160),  // frames to stay visible
+    };
+  }
+
+  function initCardCanvas(canvas) {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    const w = rect.width  || canvas.offsetParent?.offsetWidth  || 340;
+    const h = rect.height || canvas.offsetParent?.offsetHeight || 520;
+    canvas.width  = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width  = w + 'px';
+    canvas.style.height = h + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    // Create stars staggered
+    const stars = [];
+    for (let i = 0; i < STAR_COUNT; i++) {
+      const s = makeCardStar(w, h);
+      s.phase = (i / STAR_COUNT) * Math.PI * 2; // stagger phases
+      stars.push(s);
+    }
+
+    function tick() {
+      ctx.clearRect(0, 0, w, h);
+      stars.forEach(s => {
+        // State machine
+        if (s.state === 'fadein') {
+          s.alpha += 0.025;
+          if (s.alpha >= 1) { s.alpha = 1; s.state = 'hold'; s.holdTimer = 0; }
+        } else if (s.state === 'hold') {
+          s.holdTimer++;
+          // gentle twinkle during hold
+          s.alpha = 0.75 + 0.25 * Math.sin(s.holdTimer * 0.12 + s.phase);
+          if (s.holdTimer >= s.holdMax) s.state = 'fadeout';
+        } else if (s.state === 'fadeout') {
+          s.alpha -= 0.022;
+          if (s.alpha <= 0) {
+            // teleport to new random position
+            const ns = makeCardStar(w, h);
+            Object.assign(s, ns);
+            s.alpha = 0;
+            s.state = 'fadein';
+          }
+        }
+        if (s.isSpark) drawSparkle(ctx, s.x, s.y, s.r, s.color, Math.max(0, s.alpha));
+        else           drawDot(ctx,     s.x, s.y, s.r, s.color, Math.max(0, s.alpha));
+      });
+      requestAnimationFrame(tick);
+    }
+    tick();
+  }
+
+  // Init all card canvases (wait for layout)
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.card-stars-canvas').forEach(c => {
+      // Small delay per card so they don't all start in sync
+      setTimeout(() => initCardCanvas(c), Math.random() * 400);
+    });
+  });
+
+
+  window.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 20;
+    const y = (e.clientY / window.innerHeight - 0.5) * 20;
+    document.querySelector('.planet-1').style.transform = `translateY(${y * 0.5}px) translateX(${x * 0.3}px)`;
+    document.querySelector('.planet-2').style.transform = `translateY(${-y * 0.4}px) translateX(${-x * 0.2}px)`;
+  });
+</script>
+</body>
+</html>
